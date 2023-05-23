@@ -1,6 +1,6 @@
 # DTT-Real-Estate
 
-DTT Internship Assesment
+DTT Internship Assessment
 
 Min Android SDK 31 <br>
 Min iOS version 13.2 <br>
