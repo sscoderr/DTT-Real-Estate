@@ -87,7 +87,6 @@ class DetailsPageState extends State<DetailsPage> {
         body: Stack(
             children: [
               SingleChildScrollView(
-                scrollDirection: Axis.vertical,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
@@ -198,19 +197,25 @@ class DetailsPageState extends State<DetailsPage> {
                                           ),
                                         ),
                                         SizedBox(width: 4.w),
-                                        SvgPicture.asset(
-                                          'assets/Icons/ic_location.svg',
-                                          width: 2.h,
-                                          height: 2.h,
-                                          color: AppColors.medium,
+                                        Visibility(
+                                          visible: widget.distance == '0.0' ? false : true,
+                                            child: SvgPicture.asset(
+                                              'assets/Icons/ic_location.svg',
+                                              width: 2.h,
+                                              height: 2.h,
+                                              color: AppColors.medium,
+                                            ),
                                         ),
                                         SizedBox(width: 1.w),
-                                        Text(
-                                          '${widget.distance} km',
-                                          style: const TextStyle(
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.normal,
-                                            color: AppColors.medium,
+                                        Visibility(
+                                          visible: widget.distance == '0.0' ? false : true,
+                                          child: Text(
+                                            '${widget.distance} km',
+                                            style: const TextStyle(
+                                              fontSize: 12.0,
+                                              fontWeight: FontWeight.normal,
+                                              color: AppColors.medium,
+                                            ),
                                           ),
                                         ),
                                       ]
@@ -246,7 +251,7 @@ class DetailsPageState extends State<DetailsPage> {
                               ),
                               SizedBox(height: 2.h),
                               SizedBox(
-                                height: 38.h,
+                                height: 34.h,
                                 child: Visibility(
                                   visible: screenOpen,
                                   child: GoogleMap(

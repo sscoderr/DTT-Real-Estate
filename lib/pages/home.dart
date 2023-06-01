@@ -27,7 +27,6 @@ class HomeScreen extends StatelessWidget {
           builder: (context, orientation) {
             SizerUtil.setScreenSize(constraints, orientation);
             return MaterialApp(
-              title: 'Bottom Navigation Demo',
               theme: ThemeData(
                 fontFamily: 'GothamSSm',
               ),
@@ -53,6 +52,7 @@ class MyHomePageState extends State<MyHomePage> {
   String searchText = '';
   final TextEditingController searchController = TextEditingController();
   Position? currentLocation;
+  bool isLocationPermissionAllowed = true;
 
   List<String> appBarTitles = ['DTT REAL ESTATE','ABOUT'];
 
@@ -68,6 +68,9 @@ class MyHomePageState extends State<MyHomePage> {
     // Check location permission
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        isLocationPermissionAllowed = false;
+      });
       return;
     }
 
@@ -76,10 +79,13 @@ class MyHomePageState extends State<MyHomePage> {
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.whileInUse &&
           permission != LocationPermission.always) {
+        setState(() {
+          isLocationPermissionAllowed = false;
+        });
         return;
       } else{
         setState(() {
-            fetchHouses();
+          fetchHouses();
         });
       }
     }
@@ -98,7 +104,7 @@ class MyHomePageState extends State<MyHomePage> {
         int latitude = houseData['latitude'];
         int longitude = houseData['longitude'];
         double distance = await calculateDistance(latitude.toDouble(),longitude.toDouble());
-        print(double.parse(distance.toStringAsFixed(1)));
+
         final house = House(
           id: houseData['id'],
           price: houseData['price'],
@@ -244,7 +250,7 @@ class MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Expanded(
-            child: ListViewWidget(houseList: houses, searchText: searchText,),
+            child: ListViewWidget(houseList: houses, searchText: searchText, distanceCanBeVisible: isLocationPermissionAllowed,),
           ),
         ],
       ),

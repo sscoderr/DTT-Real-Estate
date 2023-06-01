@@ -13,8 +13,8 @@ import 'package:dttassessment/pages/details.dart';
 class ListViewWidget extends StatelessWidget {
   final List<House> houseList;
   final String searchText;
-
-  const ListViewWidget({super.key, required this.houseList, required this.searchText});
+  final bool distanceCanBeVisible;
+  const ListViewWidget({super.key, required this.houseList, required this.searchText, required this.distanceCanBeVisible});
 
   List<House> get filteredHouseList {
     // Filter the houseList based on searchText
@@ -196,21 +196,27 @@ class ListViewWidget extends StatelessWidget {
                                   ),
                                 )
                                 ),
-                                SvgPicture.asset(
-                                  'assets/Icons/ic_location.svg',
-                                  width: 2.h,
-                                  height: 2.h,
-                                  color: AppColors.medium,
+                                Visibility(
+                                  visible: distanceCanBeVisible,
+                                    child:SvgPicture.asset(
+                                      'assets/Icons/ic_location.svg',
+                                      width: 2.h,
+                                      height: 2.h,
+                                      color: AppColors.medium,
+                                    ),
                                 ),
                                 const SizedBox(width: 3.0),
-                                Text(
-                                  '${house.distance}km',
-                                  style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.normal,
-                                    color: AppColors.medium,
-                                  ),
-                                ),
+                                Visibility(
+                                  visible: distanceCanBeVisible,
+                                    child: Text(
+                                      '${house.distance}km',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.normal,
+                                        color: AppColors.medium,
+                                      ),
+                                    ),
+                                )
                               ],
                             ),
                           ],
