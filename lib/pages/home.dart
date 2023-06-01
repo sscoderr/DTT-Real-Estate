@@ -98,6 +98,7 @@ class MyHomePageState extends State<MyHomePage> {
         int latitude = houseData['latitude'];
         int longitude = houseData['longitude'];
         double distance = await calculateDistance(latitude.toDouble(),longitude.toDouble());
+        print(double.parse(distance.toStringAsFixed(1)));
         final house = House(
           id: houseData['id'],
           price: houseData['price'],
@@ -110,7 +111,7 @@ class MyHomePageState extends State<MyHomePage> {
           description: houseData['description'],
           latitude: houseData['latitude'],
           longitude: houseData['longitude'],
-          distance: distance.toInt(),
+          distance: double.parse(distance.toStringAsFixed(1)),
         );
         houseList.add(house);
       }

@@ -1,5 +1,6 @@
 
 import 'package:dttassessment/utils/constants.dart';
+import 'package:dttassessment/widgets/empty_list.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -72,25 +73,7 @@ class ListViewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     if (filteredHouseList.isEmpty && searchText.isNotEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/Images/search_state_empty.png',
-              width: 200,
-              height: 200,
-            ),
-            const Text(
-              'No results found! \nPerhaps try another search?',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18,
-                  fontWeight: FontWeight.w300,
-                  color: AppColors.medium),
-            ),
-          ],
-        ),
-      );
+      return const EmptyListWarning();
     } else {
       return ListView.builder(
         itemCount: filteredHouseList.length,
@@ -157,11 +140,11 @@ class ListViewWidget extends StatelessWidget {
                               '${house.zip} ${house.city}',
                               style: const TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.normal,
+                                fontWeight: FontWeight.w400,
                                 color: AppColors.medium,
                               ),
                             ),
-                            const SizedBox(height: 35.0),
+                            const SizedBox(height: 33.0),
                             Row(
                               children: [
                                 SvgPicture.asset(

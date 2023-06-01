@@ -10,7 +10,7 @@ class House {
   final String description;
   final int latitude;
   final int longitude;
-  final int distance;
+  final double distance;
 
   House({required this.id,
     required this.price,
