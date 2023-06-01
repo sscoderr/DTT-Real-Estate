@@ -13,4 +13,5 @@ The app has been tested in both Android and IOS platforms, Android release apk c
 Here is hours log:
 <br>
 
-<img width="989" alt="Screenshot 2023-05-23 at 01 51 37" src="https://github.com/sscoderr/DTT-Real-Estate/assets/25704503/ea0e5837-1948-49c4-a2c8-b6077fab1ec7">
+
+<img width="975" alt="Screenshot 2023-06-02 at 02 29 44" src="https://github.com/sscoderr/DTT-Real-Estate/assets/25704503/cdd11412-dbb2-443c-b539-9e767f7eb195">
