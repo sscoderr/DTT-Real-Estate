@@ -1,25 +1,23 @@
 import 'dart:math';
 import 'dart:convert';
+import 'package:dttassessment/utils/constants.dart';
+import 'package:dttassessment/widgets/about.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:dttassessment/theme/colors.dart';
 import 'package:dttassessment/list/listview_widget.dart';
-import 'package:dttassessment/list/house_item_structure.dart';
-
-
+import 'package:dttassessment/models/house_model.dart';
 
 
 void main(){
   runApp(const HomeScreen());
 }
-const appColors = AppColors();
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +31,7 @@ class HomeScreen extends StatelessWidget {
               theme: ThemeData(
                 fontFamily: 'GothamSSm',
               ),
-              home: MyHomePage(),
+              home: const MyHomePage(),
             );
           },
         );
@@ -43,15 +41,17 @@ class HomeScreen extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
+class MyHomePageState extends State<MyHomePage> {
+  int selectedIndex = 0;
   List<House> houses = [];
-  String _searchText = '';
-  TextEditingController _searchController = TextEditingController();
+  String searchText = '';
+  final TextEditingController searchController = TextEditingController();
   Position? currentLocation;
 
   List<String> appBarTitles = ['DTT REAL ESTATE','ABOUT'];
@@ -85,12 +85,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-
   Future<void> fetchHouses() async {
-    final url = 'https://intern.d-tt.nl/api/house';
-    final headers = {'Access-Key': '98bww4ezuzfePCYFxJEWyszbUXc7dxRx'};
+    final headers = {'Access-Key': Constants.apiKEY};
 
-    final response = await http.get(Uri.parse(url), headers: headers);
+    final response = await http.get(Uri.parse(Constants.houseAPIUrl), headers: headers);
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
@@ -159,20 +157,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return distance;
   }
+
   double _toRadians(double degree) {
     return degree * pi / 180;
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
   void clearSearch() {
     setState(() {
-      _searchText = '';
-      _searchController.clear();
+      searchText = '';
+      searchController.clear();
     });
   }
 
@@ -183,44 +182,44 @@ class _MyHomePageState extends State<MyHomePage> {
     fetchHouses();
   }
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _widgetOptions = [
+    final List<Widget> widgetOptions = [
       Column(
         children: [
           Padding(
             padding: EdgeInsets.only(top: 0.75.h, bottom: 1.5.h, right: 4.2.w, left: 4.2.w),
             child: Container(
               decoration: BoxDecoration(
-                color: appColors.darkGray,
+                color: AppColors.darkGray,
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: Padding(
                 padding: EdgeInsets.only(left: 4.w, top: 0.4.h),
                 child: TextField(
-                  controller: _searchController,
-                  cursorColor: appColors.medium,
-                  style: TextStyle(
-                    color: appColors.strong,
+                  controller: searchController,
+                  cursorColor: AppColors.medium,
+                  style: const TextStyle(
+                    color: AppColors.strong,
                     fontFamily: 'GothamSSm',
                     fontWeight: FontWeight.w300,
                     fontSize: 17,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search for a home',
-                    hintStyle: TextStyle(
-                      color: appColors.medium,
+                    hintStyle: const TextStyle(
+                      color: AppColors.medium,
                       fontFamily: 'GothamSSm',
                     ),
-                    suffixIcon: _searchText.isNotEmpty
+                    suffixIcon: searchText.isNotEmpty
                         ? IconButton(
-                      icon: Icon(Icons.clear, color: appColors.strong),
+                      icon: const Icon(Icons.clear, color: AppColors.strong),
                       onPressed: () {
                         setState(() {
                           clearSearch();
@@ -228,7 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     )
                         : IconButton(
-                      icon: Icon(Icons.search, color: appColors.medium),
+                      icon: const Icon(Icons.search, color: AppColors.medium),
                       onPressed: () {
                       },
                     ),
@@ -236,7 +235,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      _searchText = value;
+                      searchText = value;
                     });
                   },
                 ),
@@ -244,85 +243,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Expanded(
-            child: ListViewWidget(houseList: houses, searchText: _searchText,),
+            child: ListViewWidget(houseList: houses, searchText: searchText,),
           ),
         ],
       ),
-      Column(
-        children: [
-          Expanded(
-            child: Container(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.5.w, vertical: 0.5.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Greetings I am Sabahattin, a mobile app developer with four years of extensive experience in the field. I am also the person who developed DTT Real Estate app. Discover a new way to navigate the market with DTT Real Estate. '
-                          'Effortlessly browse properties, access comprehensive info, and schedule viewings with ease. Stay ahead with regular updates driven by DTT\'s passion for innovation.'
-                          ' Embrace the future of real estate today. With DTT Real Estate, you can effortlessly explore a vast range of properties, browse through stunning images, and access comprehensive information.'
-                          ' Experience the ease of browsing stunning visuals, exploring detailed descriptions, and accessing crucial information such as pricing, location, and amenities. '
-                          'DTT Real Estate goes beyond just listing properties. It embraces the essence of the Netherlands, highlighting the vibrant neighborhoods, cultural landmarks, and unique lifestyle offerings that make each location special. ',
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w300,
-                        color: appColors.medium,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      "Design and Development",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w400,
-                        color: appColors.strong,
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      children: [
-                        Image.asset('assets/Images/dtt_banner.png'),
-                        SizedBox(width: 6.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "by DTT",
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w300,
-                                color: appColors.strong,
-                              ),
-                            ),
-                            SizedBox(height: 0.3.h),
-                            Center(
-                              child: InkWell(
-                                  child: Text(
-                                    "d-tt.nl",
-                                    style: TextStyle(
-                                      fontSize: 12.0,
-                                      fontWeight: FontWeight.w300,
-                                      color: Colors.blueAccent,
-                                    ),
-                                  ),
-                                  onTap: () => launch('https://d-tt.nl')
-                              ),
-                            )
-                          ],
-                        ),
-                      ]
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ]
-      )
+      const AboutWidget(),
     ];
 
     return Scaffold(
-      backgroundColor: appColors.lightGray,
+      backgroundColor: AppColors.lightGray,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: false,
@@ -333,24 +262,24 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              appBarTitles[_selectedIndex],
-              style: TextStyle(
+              appBarTitles[selectedIndex],
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'GothamSSm',
-                color: appColors.strong,
+                color: AppColors.strong,
               ),
             ),
           ),
         ),
       ),
       body: SizerUtil.orientation == Orientation.portrait
-          ? _widgetOptions.elementAt(_selectedIndex)
+          ? widgetOptions.elementAt(selectedIndex)
           : Row(
         children: [
           Expanded(
             flex: 1,
-            child: _widgetOptions.elementAt(_selectedIndex),
+            child: widgetOptions.elementAt(selectedIndex),
           ),
         ],
       ),
@@ -365,16 +294,16 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Info',
           ),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: selectedIndex,
 
-        backgroundColor: appColors.white,
-        selectedItemColor: appColors.strong,
-        unselectedItemColor: appColors.light,
+        backgroundColor: AppColors.white,
+        selectedItemColor: AppColors.strong,
+        unselectedItemColor: AppColors.light,
 
         showSelectedLabels: false,
         showUnselectedLabels: false,
 
-        onTap: _onItemTapped,
+        onTap: onItemTapped,
       ),
     );
   }

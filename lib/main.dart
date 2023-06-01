@@ -1,22 +1,22 @@
-import 'package:dttassessment/home.dart';
+import 'package:dttassessment/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dttassessment/theme/colors.dart';
 
 void main() {
-  runApp(MaterialApp(
-    title: 'Splash Screen Example',
+  runApp(const MaterialApp(
     home: MyApp(),
   ));
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<MyApp> {
-  AppColors appColors = AppColors();
+class SplashScreenState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
@@ -25,18 +25,18 @@ class _SplashScreenState extends State<MyApp> {
 
   Future<void> navigateToHome() async {
     // Simulate a delay for the splash screen
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
     // Navigate to the home screen
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: appColors.dttRed,
+      backgroundColor: AppColors.dttRed,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
