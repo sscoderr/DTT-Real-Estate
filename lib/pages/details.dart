@@ -39,17 +39,25 @@ void main() {
 }
 
 
-class DetailsPage extends StatelessWidget {
+class DetailsPage extends StatefulWidget {
   final House selectedItem;
   final String distance;
 
-  const DetailsPage({super.key, required this.selectedItem, required this.distance});
+  const DetailsPage({Key? key, required this.selectedItem, required this.distance})
+      : super(key: key);
 
+  @override
+  DetailsPageState createState() => DetailsPageState();
+}
 
-  void _launchMapsApp(double latitude, double longitude) async {
+class DetailsPageState extends State<DetailsPage> {
+  bool screenOpen = true;
+
+  void launchMapsApp(double latitude, double longitude) async {
     String mapsUrl;
     if (Platform.isAndroid) {
-      mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude';
+      mapsUrl =
+      'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude';
     } else if (Platform.isIOS) {
       mapsUrl = 'http://maps.apple.com/?daddr=$latitude,$longitude';
     } else {
@@ -67,195 +75,237 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: 25.h,
-            width: 100.w,
-            child: Stack(
-              children: [
-                CachedNetworkImage(
-                  imageUrl: Constants.baseAPIUrl + selectedItem.image,
-                  fit: BoxFit.cover,
-                  width: 100.w,
-                  height: 25.h,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
-                Positioned(
-                  top: 3.h,
-                  left: 2.w,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    color: Colors.white,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              transform: Matrix4.translationValues(0.0, -10.0, 0.0),
-              decoration: const BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12.0),
-                  topRight: Radius.circular(12.0),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 4.h),
+    return WillPopScope(
+      onWillPop: () async {
+        setState(() {
+          screenOpen = false;
+        });
+      Navigator.of(context).pop();
+      return false;
+    },
+    child:  Scaffold(
+        body: Stack(
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.vertical,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(child:Text(
-                            // Regular Expression for put commas to the amount of money
-                            '\$${selectedItem.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                            style: const TextStyle(
-                              fontSize: 18.0,
-                              fontFamily: 'GothamSSm',
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.strong,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 25.h,
+                      width: 100.w,
+                      child: Stack(
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl: Constants.baseAPIUrl + widget.selectedItem.image,
+                            fit: BoxFit.cover,
+                            width: 100.w,
+                            height: 25.h,
+                            placeholder: (context, url) =>
+                            const Center(
+                              child: CircularProgressIndicator(),
                             ),
-                          )
-                        ),
-                        SizedBox(width: 8.4.w),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/Icons/ic_bed.svg',
-                              width: 2.h,
-                              height: 2.h,
-                              color: AppColors.medium,
-                            ),
-                            SizedBox(width: 1.w),
-                            Text(
-                              selectedItem.bedrooms.toString(),
-                              style: const TextStyle(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.medium,
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            SvgPicture.asset(
-                              'assets/Icons/ic_bath.svg',
-                              width: 2.h,
-                              height: 2.h,
-                              color: AppColors.medium,
-                            ),
-                            SizedBox(width: 1.w),
-                            Text(
-                              selectedItem.bathrooms.toString(),
-                              style: const TextStyle(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.medium,
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            SvgPicture.asset(
-                              'assets/Icons/ic_layers.svg',
-                              width: 2.h,
-                              height: 2.h,
-                              color: AppColors.medium,
-                            ),
-                            SizedBox(width: 1.w),
-                            Text(
-                              selectedItem.size.toString(),
-                              style: const TextStyle(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.medium,
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            SvgPicture.asset(
-                              'assets/Icons/ic_location.svg',
-                              width: 2.h,
-                              height: 2.h,
-                              color: AppColors.medium,
-                            ),
-                            SizedBox(width: 1.w),
-                            Text(
-                              '$distance km',
-                              style: const TextStyle(
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.medium,
-                              ),
-                            ),
-                          ]
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    const Text(
-                      "Description",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.strong,
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
-                    Text(
-                      selectedItem.description,
-                      style: const TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w300,
-                        color: AppColors.medium,
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
-                    const Text(
-                      "Location",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.strong,
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
-                    Expanded(
-                      child: GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(selectedItem.latitude.toDouble(), selectedItem.longitude.toDouble()),
-                          zoom: 12,
-                        ),
-                        markers: {
-                          Marker(
-                            markerId: const MarkerId('targetMarker'),
-                            position: LatLng(selectedItem.latitude.toDouble(), selectedItem.longitude.toDouble()),
-                            infoWindow: const InfoWindow(title: 'House Location'),
-                            onTap: () {
-                              _launchMapsApp(selectedItem.latitude.toDouble(), selectedItem.longitude.toDouble());
-                            }
+                            errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                           ),
-                        },
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      child: Container(
+                        transform: Matrix4.translationValues(0.0, -10.0, 0.0),
+                        decoration: const BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12.0),
+                            topRight: Radius.circular(12.0),
+                          ),
+                        ),
+                        height: 100.h,
+                        width: 100.w,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: 5.w, right: 5.w, top: 5.h, bottom: 1.h),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Expanded(child: Text(
+                                    // Regular Expression for put commas to the amount of money
+                                    '\$${widget.selectedItem.price.toString()
+                                        .replaceAllMapped(RegExp(
+                                        r'(\d{1,3})(?=(\d{3})+(?!\d))'), (
+                                        Match m) => '${m[1]},')}',
+                                    style: const TextStyle(
+                                      fontSize: 18.0,
+                                      fontFamily: 'GothamSSm',
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.strong,
+                                    ),
+                                  )
+                                  ),
+                                  SizedBox(width: 8.4.w),
+                                  Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/Icons/ic_bed.svg',
+                                          width: 2.h,
+                                          height: 2.h,
+                                          color: AppColors.medium,
+                                        ),
+                                        SizedBox(width: 1.w),
+                                        Text(
+                                          widget.selectedItem.bedrooms.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.normal,
+                                            color: AppColors.medium,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        SvgPicture.asset(
+                                          'assets/Icons/ic_bath.svg',
+                                          width: 2.h,
+                                          height: 2.h,
+                                          color: AppColors.medium,
+                                        ),
+                                        SizedBox(width: 1.w),
+                                        Text(
+                                          widget.selectedItem.bathrooms.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.normal,
+                                            color: AppColors.medium,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        SvgPicture.asset(
+                                          'assets/Icons/ic_layers.svg',
+                                          width: 2.h,
+                                          height: 2.h,
+                                          color: AppColors.medium,
+                                        ),
+                                        SizedBox(width: 1.w),
+                                        Text(
+                                          widget.selectedItem.size.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.normal,
+                                            color: AppColors.medium,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        SvgPicture.asset(
+                                          'assets/Icons/ic_location.svg',
+                                          width: 2.h,
+                                          height: 2.h,
+                                          color: AppColors.medium,
+                                        ),
+                                        SizedBox(width: 1.w),
+                                        Text(
+                                          '${widget.distance} km',
+                                          style: const TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.normal,
+                                            color: AppColors.medium,
+                                          ),
+                                        ),
+                                      ]
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 4.h),
+                              const Text(
+                                "Description",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.strong,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                widget.selectedItem.description,
+                                style: const TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w300,
+                                  color: AppColors.medium,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              const Text(
+                                "Location",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.strong,
+                                ),
+                              ),
+                              SizedBox(height: 2.h),
+                              SizedBox(
+                                height: 38.h,
+                                child: Visibility(
+                                  visible: screenOpen,
+                                  child: GoogleMap(
+                                  initialCameraPosition: CameraPosition(
+                                    target: LatLng(
+                                        widget.selectedItem.latitude.toDouble(),
+                                        widget.selectedItem.longitude.toDouble()),
+                                    zoom: 12,
+                                  ),
+                                  markers: {
+                                    Marker(
+                                        markerId: const MarkerId(
+                                            'targetMarker'),
+                                        position: LatLng(
+                                            widget.selectedItem.latitude.toDouble(),
+                                            widget.selectedItem.longitude.toDouble()),
+                                        infoWindow: const InfoWindow(
+                                            title: 'House Location'),
+                                        onTap: () {
+                                          launchMapsApp(
+                                              widget.selectedItem.latitude.toDouble(),
+                                              widget.selectedItem.longitude
+                                                  .toDouble());
+                                        }
+                                    ),
+                                  },
+                                ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
+              Positioned(
+                top: 3.h,
+                left: 2.w,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  color: Colors.white,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()),
+                    );
+                  },
+                ),
+              ),
+            ]
+        )
+    )
     );
+  }
+
+  State<StatefulWidget> createState() {
+    throw UnimplementedError();
   }
 }
