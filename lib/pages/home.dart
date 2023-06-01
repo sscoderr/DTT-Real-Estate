@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:convert';
 import 'package:dttassessment/utils/constants.dart';
 import 'package:dttassessment/widgets/about.dart';
@@ -8,8 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 
 import 'package:dttassessment/theme/colors.dart';
-import 'package:dttassessment/list/listview_widget.dart';
+import 'package:dttassessment/widgets/listview_widget.dart';
 import 'package:dttassessment/models/house_model.dart';
+
+import '../utils/helper.dart';
 
 
 void main(){
@@ -51,7 +52,7 @@ class MyHomePageState extends State<MyHomePage> {
   List<House> houses = [];
   String searchText = '';
   final TextEditingController searchController = TextEditingController();
-  Position? currentLocation;
+
   bool isLocationPermissionAllowed = true;
 
   List<String> appBarTitles = ['DTT REAL ESTATE','ABOUT'];
@@ -65,7 +66,7 @@ class MyHomePageState extends State<MyHomePage> {
     if (!serviceEnabled) {
       return;
     }
-    // Check location permission
+    // Check if location permission denied forever
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
       setState(() {
@@ -93,7 +94,6 @@ class MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchHouses() async {
     final headers = {'Access-Key': Constants.apiKEY};
-
     final response = await http.get(Uri.parse(Constants.houseAPIUrl), headers: headers);
 
     if (response.statusCode == 200) {
@@ -103,7 +103,7 @@ class MyHomePageState extends State<MyHomePage> {
       for (var houseData in jsonData) {
         int latitude = houseData['latitude'];
         int longitude = houseData['longitude'];
-        double distance = await calculateDistance(latitude.toDouble(),longitude.toDouble());
+        double distance = await Helper.calculateDistance(latitude.toDouble(),longitude.toDouble());
 
         final house = House(
           id: houseData['id'],
@@ -122,7 +122,8 @@ class MyHomePageState extends State<MyHomePage> {
         houseList.add(house);
       }
       setState(() {
-        houseList.sort((a, b) => a.price.compareTo(b.price));// Sorting from the cheapest to most expensive one
+        // Sorting from the cheapest to most expensive one
+        houseList.sort((a, b) => a.price.compareTo(b.price));
         houses = houseList;
       });
     } else {
@@ -130,44 +131,6 @@ class MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<double> calculateDistance(double houseLatitude, double houseLongitude) async {
-
-    if (currentLocation == null) {
-      // Get current location if location permission allowed
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse) {
-        currentLocation = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
-        );
-      }
-    }
-    if (currentLocation == null) return 0; //current location not found
-
-    double lat1 = currentLocation!.latitude;
-    double lon1 = currentLocation!.longitude;
-    double lat2 = houseLatitude;
-    double lon2 = houseLongitude;
-
-    const double earthRadius = 6371; // Radius of the earth in kilometers
-
-    double dLat = _toRadians(lat2 - lat1);
-    double dLon = _toRadians(lon2 - lon1);
-
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(lat1)) *
-            cos(_toRadians(lat2)) *
-            sin(dLon / 2) *
-            sin(dLon / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    double distance = earthRadius * c; // Distance in km
-
-    return distance;
-  }
-
-  double _toRadians(double degree) {
-    return degree * pi / 180;
-  }
 
   @override
   void dispose() {
