@@ -54,7 +54,6 @@ class MyHomePageState extends State<MyHomePage> {
   final TextEditingController searchController = TextEditingController();
 
   bool isLocationPermissionAllowed = true;
-
   List<String> appBarTitles = ['DTT REAL ESTATE','ABOUT'];
 
   Future<void> askLocationPermission() async {
@@ -130,7 +129,6 @@ class MyHomePageState extends State<MyHomePage> {
       throw Exception('Failed to fetch houses');
     }
   }
-
 
   @override
   void dispose() {
